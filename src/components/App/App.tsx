@@ -1,6 +1,6 @@
 import css from './App.module.css'
 import NoteList from '../NoteList/NoteList'
-import { fetchNotes, createNote } from '../services/noteService';
+import { fetchNotes, createNote } from '../../services/noteService';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Pagination from '../Pagination/Pagination';
 import { useState } from 'react';
@@ -8,7 +8,7 @@ import Modal from '../Modal/Modal';
 import NoteForm from '../NoteForm/NoteForm';
 import SearchBox from '../SearchBox/SearchBox';
 import { useDebouncedCallback } from 'use-debounce';
-import { deleteNote } from '../services/noteService';
+import { deleteNote } from '../../services/noteService';
 
 export default function App() {
   const [page, setPage] = useState<number>(1); 
