@@ -4,8 +4,8 @@ import type { Note } from '../types/note';
 export interface NotesResponse {
   notes: Note[];
   totalPages: number;
-  page: number;
-  perPage: number;
+  // page: number;
+  // perPage: number;
 }
 
 const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
@@ -29,8 +29,8 @@ export const fetchNotes = async (page: number = 1, searchQuery?: string): Promis
     return response.data;
 };
 
-export const createNote = async (newTitle: string, newContent: string, newTag: string) => {
-  const response = await api.post('/notes', {
+export const createNote = async (newTitle: string, newContent: string, newTag: string): Promise<Note>  => {
+  const response = await api.post<Note>('/notes', {
     title: newTitle,
     content: newContent,
     tag: newTag
@@ -39,7 +39,7 @@ export const createNote = async (newTitle: string, newContent: string, newTag: s
   return response.data;
 };
 
-export const deleteNote = async (id: number | string) => {
-  const response = await api.delete(`/notes/${id}`);
+export const deleteNote = async (id: number | string): Promise<Note> => {
+  const response = await api.delete<Note>(`/notes/${id}`);
   return response.data;
 };

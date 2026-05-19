@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import css from './SearchBox.module.css'
 
-export default function SearchBox({ onChange }: { onChange: (val: string) => void }) {
+interface SearchBoxProps {
+  onChange: (val: string) => void;
+}
+
+export default function SearchBox({ onChange }: SearchBoxProps) {
   const [localValue, setLocalValue] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

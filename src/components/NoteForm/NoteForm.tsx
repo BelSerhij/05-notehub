@@ -1,6 +1,8 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import css from './NoteForm.module.css';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createNote } from '../../services/noteService';
 
 const NoteSchema = Yup.object().shape({
   title: Yup.string()
@@ -8,27 +10,43 @@ const NoteSchema = Yup.object().shape({
     .max(50, 'Занадто довгий заголовок!')
     .required("Це поле обов'язкове"),
   content: Yup.string()
-    .min(3, 'Занадто короткий Опис!')
-    .max(500, 'Опис занадто довгий')
-    .required("Це поле обов'язкове"),
-  tag: Yup.string().oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping']).required(),
+    .max(500, 'Опис занадто довгий'),
+   tag: Yup.string()
+    .oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'])
+    .required("Виберіть тег"),
 });
 
 interface NoteFormProps {
-  onSubmit: (title: string, content: string, tag: string) => void;
   onCancel: () => void;
 }
 
-export default function NoteForm({ onSubmit, onCancel }: NoteFormProps) {
+export default function NoteForm({ onCancel }: NoteFormProps) {
+  
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: ({ title, content, tag }: { title: string; content: string; tag: string }) => 
+      createNote(title, content, tag),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+      onCancel();
+    },
+  });
+
   return (
     <Formik
       initialValues={{ title: '', content: '', tag: 'Todo' }}
       validationSchema={NoteSchema}
-      onSubmit={(values) => {
-        onSubmit(values.title, values.content, values.tag);
+      onSubmit={(values , { resetForm }) => {
+        mutation.mutate({
+          title: values.title,
+          content: values.content || '',
+          tag: values.tag,
+        });
+        resetForm();
       }}
     >
-      {({ isSubmitting, errors, touched }) => (
+      {({ errors, touched }) => (
         <Form className={css.form}>
           <div className={css.formGroup}>
             <label htmlFor="title">Title</label>
@@ -71,9 +89,9 @@ export default function NoteForm({ onSubmit, onCancel }: NoteFormProps) {
             <button
               type="submit"
               className={css.submitButton}
-              disabled={isSubmitting}
+              disabled={mutation.isPending }
             >
-              {isSubmitting ? 'Creating...' : 'Create note'}
+              {mutation.isPending  ? 'Creating...' : 'Create note'}
             </button>
           </div>
         </Form>
