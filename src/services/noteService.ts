@@ -32,7 +32,6 @@ export const createNote = async (newTitle: string, newContent: string, newTag: s
     content: newContent,
     tag: newTag
   });
-  console.log('Дані з сервера (createNote):', response.data);
   return response.data;
 };
 
